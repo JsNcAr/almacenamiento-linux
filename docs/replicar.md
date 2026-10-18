@@ -4,11 +4,24 @@ Orden recomendado. Cada paso se puede verificar antes de seguir.
 
 ## 1. Paquetes
 
+En Arch/CachyOS:
+
 ```bash
 sudo pacman -S btrfs-progs btrbk snapper smartmontools pacman-contrib \
                restic rclone nextcloud-client python jq socat \
                libimobiledevice android-tools dysk gdu btop compsize
 ```
+
+En otra distribución, instala los equivalentes con tu gestor de paquetes:
+
+- Imprescindibles: `smartmontools`, `python3`, `jq`, `socat`, `restic`, `rclone`,
+  `nextcloud-client` (o el cliente de escritorio), `libimobiledevice` (`idevicebackup2`),
+  `android-tools` (`adb`).
+- Solo si usas btrfs (ver [arquitectura.md](arquitectura.md)): `btrfs-progs`, `btrbk`.
+- `snapper` y `pacman-contrib` (paquete de `paccache`) son de Arch/openSUSE: omítelos
+  fuera de esas distribuciones; la capa de snapshots locales del sistema (paso 4) no
+  tiene equivalente directo en otras, revisa [decisiones.md](decisiones.md).
+- `dysk`, `gdu`, `btop`, `compsize` son utilidades opcionales, no dependencias.
 
 ## 2. Discos y montajes
 

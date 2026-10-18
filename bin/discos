@@ -81,11 +81,20 @@ def parse(smart):
     lbas = attrs.get(246) or attrs.get(241)
     # La unidad va en el nombre del atributo: LBAs (512 B), _32MiB, _GiB...
     unit = 32 * 2**20 if lbas and "32MiB" in lbas["name"] else 2**30 if lbas and "GiB" in lbas["name"] else 512
+    written = lbas["raw"]["value"] * unit if lbas else None
+    # Si smartctl no reconoce el modelo, el atributo 241/246 cae al nombre
+    # genérico "Total_LBAs_Written" (asume LBAs de 512 B) aunque algunos SSD
+    # (LiteOn, SanDisk...) en realidad cuentan en bloques de 32 MiB. Un disco
+    # con uso real que, interpretado en LBAs de 512 B, habría escrito menos
+    # del 1 % de su propia capacidad, casi seguro está en esa unidad.
+    if written is not None and unit == 512 and d["bytes"] and d["cycles"] and d["cycles"] >= 50 \
+            and written < d["bytes"] / 100:
+        written = lbas["raw"]["value"] * 32 * 2**20
     d.update(
         kind="SATA",
         life=life,
         critical=0,
-        written=lbas["raw"]["value"] * unit if lbas else None,
+        written=written,
         unsafe=attrs.get(174, attrs.get(192, {})).get("raw", {}).get("value"),
     )
     # En algunos discos WD/Toshiba el atributo 192 empaqueta otro dato junto
@@ -280,6 +289,22 @@ def selftest():
         {"id": 192, "name": "Power-Off_Retract_Count", "value": 100,
          "raw": {"value": 115964117019}}]}})
     assert wd["unsafe"] is None
+    # Caso real: un SSD LiteOn con 4016 ciclos de encendido, cuyo atributo 241
+    # cae al nombre genérico "Total_LBAs_Written" pero en realidad cuenta en
+    # bloques de 32 MiB (interpretado como LBAs de 512 B daría 15 MB escritos,
+    # imposible con ese uso). Debe reinterpretarse.
+    liteon = parse({"user_capacity": {"bytes": 128_035_676_160}, "power_cycle_count": 4016,
+                     "ata_smart_attributes": {"table": [
+                         {"id": 241, "name": "Total_LBAs_Written", "value": 100,
+                          "raw": {"value": 30139}}]}})
+    assert liteon["written"] == 30139 * 32 * 2**20
+    # Un HDD mecánico con el mismo nombre genérico pero un valor ya plausible
+    # en LBAs de 512 B no debe tocarse.
+    hdd = parse({"user_capacity": {"bytes": 1_000_204_886_016}, "power_cycle_count": 500,
+                 "ata_smart_attributes": {"table": [
+                     {"id": 241, "name": "Total_LBAs_Written", "value": 200,
+                      "raw": {"value": 30778250601}}]}})
+    assert hdd["written"] == 30778250601 * 512
     assert match_disk("/dev/nvme1", ["nvme0n1", "nvme1n1", "sda"]) == "nvme1n1"
     print("selftest ok")
 

@@ -45,8 +45,9 @@ sudo restic-nube cmd backup --dry-run /etc   # restic sin escribir
 
 ## Al actualizar el sistema
 
-- Si `pacman` actualiza el **kernel**, reinicia antes de montar sistemas de archivos que
-  usen módulos (exFAT, NTFS…): los módulos del kernel en uso se borran con la actualización.
-- `nextcloud-client`, `restic` y `rclone` se actualizan con `pacman -Syu`. Los archivos de
-  este repo están en tu home y en `/usr/local` / `/etc`, así que las actualizaciones no
-  los tocan.
+- Si tu gestor de paquetes (`pacman`, `apt`, `dnf`…) actualiza el **kernel**, reinicia
+  antes de montar sistemas de archivos que usen módulos (exFAT, NTFS…): los módulos del
+  kernel en uso se borran con la actualización.
+- `nextcloud-client`, `restic` y `rclone` se actualizan con el gestor de paquetes de tu
+  distribución (`pacman -Syu`, `apt upgrade`…). Los archivos de este repo están en tu
+  home y en `/usr/local` / `/etc`, así que las actualizaciones no los tocan.

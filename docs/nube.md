@@ -107,7 +107,8 @@ instala `install.sh`. Lo propio de tu máquina va en `~/.config/nube/exclude-loc
 ## Configurar
 
 ```bash
-sudo pacman -S nextcloud-client rclone restic
+sudo pacman -S nextcloud-client rclone restic   # Arch/CachyOS; en otras distros, instala
+                                                 # los equivalentes con tu gestor de paquetes
 ```
 
 1. **Contraseña de aplicación**: Nextcloud → Configuración personal → Seguridad →

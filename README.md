@@ -4,7 +4,10 @@ Herramientas y guía para organizar varios discos en un PC o portátil Linux con
 roles por disco, backups en capas (local, otro disco y servidor), monitoreo de salud
 accesible, backup de teléfonos por USB y sincronización con Nextcloud.
 
-Pensado para Arch/CachyOS con systemd, pero las ideas aplican a cualquier distribución.
+Pensado para Arch/CachyOS con systemd y btrfs. El monitoreo (`discos`, `disk-alert`,
+`disk-health-dump`) no depende de btrfs ni de la distribución; los backups en capas
+y `movil` sí requieren btrfs, y la receta de paquetes usa `pacman` (ver
+[replicar.md](docs/replicar.md) para equivalentes en otras distribuciones).
 
 ## Qué resuelve
 
